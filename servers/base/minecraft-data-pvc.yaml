@@ -1,0 +1,12 @@
+# base/minecraft-data-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minecraft-data-pvc # Will be prefixed by overlay
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path # Or your preferred storage class
+  resources:
+    requests:
+      storage: 20Gi # Default, can be patched in overlay if needed

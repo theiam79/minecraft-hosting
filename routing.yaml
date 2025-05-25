@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx-controller
+  namespace: ingress-nginx
+spec:
+  type: NodePort
+  selector:
+    # Labels matching your Ingress controller pods
+    app.kubernetes.io/name: ingress-nginx
+    app.kubernetes.io/instance: ingress-nginx
+    app.kubernetes.io/component: controller
+  ports:
+    - name: http
+      port: 80 # Internal port for the service
+      targetPort: http # Port on the Ingress controller pods (e.g., 80 or 8080)
+      nodePort: 30080 # Example: This is the <INGRESS_CONTROLLER_NODEPORT>
+                      # If you don't specify, Kubernetes assigns one.

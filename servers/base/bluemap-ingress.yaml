@@ -1,0 +1,20 @@
+# base/bluemap-ingress.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: bluemap-ingress # Will be prefixed
+  # annotations:
+  #   nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  ingressClassName: nginx # Or your ingress controller
+  rules:
+  - host: "$(INSTANCE_NAME_VAR).map.theiam79.com" # Uses the Kustomize variable INSTANCE_NAME_VAR
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bluemap-web-service # Will be prefixed, must match Bluemap Service name
+            port:
+              name: web # Or number: 8100

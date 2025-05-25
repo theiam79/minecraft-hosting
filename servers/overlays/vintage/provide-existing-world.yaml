@@ -1,0 +1,25 @@
+# Include this in overlay's kustomization.yaml's 'patchesStrategicMerge' or 'patches' list
+# if you want to use an existing world file from a hostPath.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minecraft-server # Will be prefixed by overlay (e.g., sample-minecraft-server)
+spec:
+  template:
+    spec:
+      containers:
+      - name: minecraft-server-container # Must match container name in base/patched StatefulSet
+        env:
+        - name: WORLD
+          value: /worlds/backup/SourceWorld.tar.gz #Path inside container
+        - name: WORLD_INDEX
+          value: "3"
+        volumeMounts:
+        - name: existing-world-data
+          mountPath: /worlds/backup/SourceWorld.tar.gz # Must match $WORLD (or be the file if $WORLD is dir)
+          readOnly: true
+      volumes:
+      - name: existing-world-data
+        hostPath:
+          path: /home/minecraft/servers/overlays/vintage/vintage-2025-05-24-14-31.tar.gz # Actual path on your k3s node
+          type: File

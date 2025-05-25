@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namePrefix: vintage- # This is the single line to change for the "name"
+
+# Namespace for this instance, if you use namespaces
+namespace: minecraft-vintage
+
+resources:
+  - ../../base
+  - namespace.yaml
+
+# Replaced 'commonLabels:' with 'labels:' transformer
+labels:
+- pairs:
+    instance: vintage # This label is primarily for organization/selection now
+  includeSelectors: true # Ensures selectors are updated if they use this label
+  includeTemplates: true # Ensures pod templates get this label if they match
+
+patches:
+  # Patch Minecraft Server StatefulSet (image, env vars, claimNames)
+  - target:
+      kind: StatefulSet
+      name: minecraft-server # Name from base
+    path: minecraft-server-config.yaml
+
+  # Patch Bluemap Deployment (Minecraft world PVC claimName, Bluemap data PVC claimName, ConfigMap names)
+  - target:
+      kind: Deployment
+      name: bluemap-web # Name from base
+    path: bluemap-deployment-patch.yaml # Renamed patch file for clarity
+
+  # - target:
+  #     kind: ConfigMap
+  #     name: bluemap-map-config # Explicit prefixed name
+  #   path: bluemap-map-patch.yaml
+
+patchesStrategicMerge:
+  - provide-existing-world.yaml
+  - provide-custom-jar.yaml

@@ -1,0 +1,13 @@
+# base/minecraft-server-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: minecraft-server # Will be prefixed by overlay
+  annotations:
+    "mc-router.itzg.me/externalServerName": "$(INSTANCE_NAME_VAR).mc.theiam79.com"
+spec:
+  ports:
+  - port: 25565
+    name: minecraft
+  selector:
+    app: minecraft-server # Will be prefixed by overlay, matches StatefulSet labels

@@ -1,0 +1,12 @@
+# base/bluemap-data-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bluemap-web-pvc # Will be prefixed
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName: local-path # Or your preferred storage class
+  resources:
+    requests:
+      storage: 10Gi # Default, can be patched

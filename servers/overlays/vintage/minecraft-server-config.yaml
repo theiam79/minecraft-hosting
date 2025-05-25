@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minecraft-server # Kustomize matches this name from base
+spec:
+  serviceName: vintage-minecraft-server
+  template:
+    spec:
+      containers:
+      - name: minecraft-server-container # Must match the container name in base
+        image: itzg/minecraft-server:java8
+        env:
+        - name: "MEMORY"
+          value: ""
+      # Patch claimNames to use the Kustomize variable and base PVC name.
+      # The namePrefix from the overlay's kustomization.yaml will ensure the PVCs
+      # are created with names like "vintage-minecraft-data-pvc".
+      # This patch ensures the StatefulSet refers to these correctly prefixed names.
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: vintage-minecraft-data-pvc
+      - name: backups
+        persistentVolumeClaim:
+          claimName: vintage-minecraft-backup-pvc
+      # Other volumes (like for spigot.jar or existing world) will be added by their respective optional patches

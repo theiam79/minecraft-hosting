@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bluemap-map-config # Will be prefixed
+data:
+  # Default map configurations. These can be overridden or extended in overlays.
+  # Note: world paths are relative to /app/world in the container
+  overworld.conf: |
+    world: "world" # Assumes the main world data is directly in /app/world/world
+    dimension: "minecraft:overworld"
+    name: "Overworld"
+    ambient-light: 0.1
+    cave-detection-ocean-floor: -5
+    min-inhabited-time: 0
+  nether.conf: |
+    world: "world" # Path to Nether world data
+    dimension: "minecraft:the_nether"
+    name: "Nether"
+    sorting: 100
+    sky-color: "#290000"
+    void-color: "#150000"
+    ambient-light: 0.6
+    remove-caves-below-y: -10000
+    cave-detection-ocean-floor: -5
+    max-y: 90
+    min-inhabited-time: 0
+  end.conf: |
+    world: "world" # Path to End world data
+    dimension: "minecraft:the_end"
+    name: "End"
+    sorting: 200
+    sky-color: "#080010"
+    void-color: "#080010"
+    ambient-light: 0.6
+    remove-caves-below-y: -10000
+    cave-detection-ocean-floor: -5
+    min-inhabited-time: 0

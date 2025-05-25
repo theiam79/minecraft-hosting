@@ -1,0 +1,27 @@
+# Include this in overlay's kustomization.yaml's 'patchesStrategicMerge' or 'patches' list
+# if you want to use a custom JAR from a hostPath.
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minecraft-server # Will be prefixed
+spec:
+  template:
+    spec:
+      containers:
+      - name: minecraft-server-container
+        env:
+        - name: TYPE
+          value: CUSTOM
+        - name: CUSTOM_SERVER
+          value: "/jars/spigot-1.13.2.jar"
+        - name: "MAX_MEMORY"
+          value: "8G"
+        volumeMounts:
+        - name: spigot-custom-jar
+          mountPath: /jars/spigot-1.13.2.jar # Must match $CUSTOM_SERVER
+          readOnly: true
+      volumes:
+      - name: spigot-custom-jar
+        hostPath:
+          path: /home/minecraft/servers/overlays/vintage/spigot-1.13.2.jar # Actual path on your k3s node
+          type: File

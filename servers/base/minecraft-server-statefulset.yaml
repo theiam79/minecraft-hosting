@@ -1,0 +1,72 @@
+# base/minecraft-server-statefulset.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minecraft-server # Will be prefixed by overlay
+  labels:
+    app: minecraft-server # Will be prefixed by overlay
+spec:
+  replicas: 0
+  serviceName: minecraft-server # Will be prefixed by overlay
+  selector:
+    matchLabels:
+      app: minecraft-server # Will be prefixed by overlay
+  template:
+    metadata:
+      labels:
+        app: minecraft-server # Will be prefixed by overlay
+    spec:
+      securityContext:
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+      - name: minecraft-server-container # Renamed for clarity, will NOT be prefixed by default namePrefix
+        image: itzg/minecraft-server:latest # Default image, override in overlay
+        resources:
+          limits:
+            memory: "12Gi" # Default, override in overlay
+          requests:
+            memory: "4Gi" # Default
+        env:
+        - name: EULA
+          value: "TRUE"
+        - name: TYPE
+          value: VANILLA
+        - name: DIFFICULTY
+          value: normal
+        - name: FORCE_GAMEMODE
+          value: "true"
+        - name: MODE
+          value: survival
+        # Add other common environment variables here if any
+        # TYPE, CUSTOM_SERVER, MAX_MEMORY, WORLD will be set in overlay patch
+        ports:
+        - containerPort: 25565
+          name: minecraft
+        volumeMounts:
+        - name: data
+          mountPath: /data
+        # world-backup and spigot-jar volumeMounts will be added by optional patches in overlay
+      - name: mc-backup-container # Renamed for clarity
+        image: itzg/mc-backup:latest # Default image
+        env:
+          - name: BACKUP_INTERVAL
+            value: "1h"
+          - name: INITIAL_DELAY
+            value: "15m"
+          - name: PRUNE_BACKUPS_COUNT
+            value: "10"
+        volumeMounts:
+          - mountPath: /data
+            name: data
+            readOnly: true
+          - mountPath: /backups
+            name: backups
+      volumes:
+      - name: data # This name is referenced by volumeMounts
+        persistentVolumeClaim:
+          claimName: minecraft-data-pvc # Will be prefixed by overlay, this reference needs to be exact
+      - name: backups # This name is referenced by volumeMounts
+        persistentVolumeClaim:
+          claimName: minecraft-backup-pvc # Will be prefixed by overlay
+      # world-backup and spigot-jar volumes will be added by optional patches in overlay

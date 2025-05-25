@@ -1,0 +1,21 @@
+# Patch for Bluemap Deployment to set correct PVC claimNames and ConfigMap names using INSTANCE_NAME_VAR
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bluemap-web # Kustomize matches this name from base
+spec:
+  template:
+    spec:
+      volumes:
+      - name: minecraft-server-world # Must match the volume name in base bluemap-deployment.yaml
+        persistentVolumeClaim:
+          claimName: playground-minecraft-data-pvc
+      - name: bluemap-app-data
+        persistentVolumeClaim:
+          claimName: playground-bluemap-data-pvc
+      - name: bluemap-core-cm # Must match volume name in base
+        configMap:
+          name: playground-bluemap-core-config
+      - name: bluemap-map-cm # Must match volume name in base
+        configMap:
+          name: playground-bluemap-map-config

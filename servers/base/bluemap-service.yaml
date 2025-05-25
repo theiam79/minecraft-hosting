@@ -1,0 +1,12 @@
+# base/bluemap-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: bluemap-web-service # Will be prefixed
+spec:
+  selector:
+    app: bluemap-web # Will be prefixed, matches Bluemap Deployment labels
+  ports:
+  - port: 8100
+    targetPort: 8100 # Or 'web' if you named the port in the deployment
+    name: web

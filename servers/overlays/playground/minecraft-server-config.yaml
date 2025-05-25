@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: minecraft-server # Kustomize matches this name from base
+  annotations:
+    "mc-router.itzg.me/defaultServer": "true"
+spec:
+  serviceName: playground-minecraft-server
+  template:
+    spec:
+      containers:
+      - name: minecraft-server-container # Must match the container name in base
+        env:
+        - name: "MEMORY"
+          value: ""
+        - name: JVM_XX_OPTS
+          value: "-XX:MaxRAMPercentage=75"
+        - name: MODE
+          value: creative
+      # Patch claimNames to use the Kustomize variable and base PVC name.
+      # The namePrefix from the overlay's kustomization.yaml will ensure the PVCs
+      # are created with names like "playground-minecraft-data-pvc".
+      # This patch ensures the StatefulSet refers to these correctly prefixed names.
+      volumes:
+      - name: data
+        persistentVolumeClaim:
+          claimName: playground-minecraft-data-pvc
+      - name: backups
+        persistentVolumeClaim:
+          claimName: playground-minecraft-backup-pvc
+      # Other volumes (like for spigot.jar or existing world) will be added by their respective optional patches

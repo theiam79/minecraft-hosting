@@ -1,0 +1,12 @@
+# base/minecraft-backup-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minecraft-backup-pvc # Will be prefixed by overlay
+spec:
+  accessModes:
+    - ReadWriteMany # Or ReadWriteOnce depending on your backup strategy and storage
+  storageClassName: nfs-client # Or your preferred storage class for backups
+  resources:
+    requests:
+      storage: 10Gi # Default, adjust as needed

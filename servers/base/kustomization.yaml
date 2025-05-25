@@ -1,0 +1,30 @@
+# base/kustomization.yaml
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - minecraft-server-statefulset.yaml
+  - minecraft-server-service.yaml
+  - minecraft-data-pvc.yaml
+  - minecraft-backup-pvc.yaml
+  - bluemap-deployment.yaml
+  - bluemap-service.yaml
+  - bluemap-ingress.yaml
+  - bluemap-configmaps.yaml
+  - bluemap-data-pvc.yaml
+  - bluemap-web-pvc.yaml
+
+# Variable to hold the instance name (e.g., "vintage")
+# This will be sourced from the 'instance' label applied by commonLabels from the overlay.
+vars:
+  - name: INSTANCE_NAME_VAR # Changed variable name for clarity
+    objref:
+      kind: Service # The Service where the label will be present
+      name: minecraft-server # Base name of the Service
+      apiVersion: v1
+    fieldref:
+      fieldpath: metadata.labels.instance # The label key
+      
+# You can add common labels that apply to all instances here if needed
+# commonLabels:
+#   app.kubernetes.io/managed-by: kustomize
