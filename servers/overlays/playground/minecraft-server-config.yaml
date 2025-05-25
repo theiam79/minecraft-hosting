@@ -17,6 +17,17 @@ spec:
           value: "-XX:MaxRAMPercentage=75"
         - name: MODE
           value: creative
+        - name: TYPE
+          value: FABRIC
+        - name: MODRINTH_PROJECTS
+          value: |
+            fabric-api
+            chunky
+        - name: OPS
+          value: |
+            TheIAm79
+        - name: EXISTING_OPS_FILE
+          value: MERGE
       # Patch claimNames to use the Kustomize variable and base PVC name.
       # The namePrefix from the overlay's kustomization.yaml will ensure the PVCs
       # are created with names like "playground-minecraft-data-pvc".
