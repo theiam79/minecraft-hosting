@@ -8,14 +8,21 @@ spec:
     spec:
       containers:
       - name: minecraft-server-container # Must match the container name in base
-        image: itzg/minecraft-server:java8
+        image: itzg/minecraft-server:java11
         env:
         - name: "MEMORY"
           value: ""
+        - name: MODRINTH_PROJECTS
+          value: ""
+        - name: PLUGINS
+          value: https://cdn.modrinth.com/data/swbUV1cr/versions/Qgel0oQB/BlueMap-3.21-spigot.jar
       # Patch claimNames to use the Kustomize variable and base PVC name.
       # The namePrefix from the overlay's kustomization.yaml will ensure the PVCs
       # are created with names like "vintage-minecraft-data-pvc".
       # This patch ensures the StatefulSet refers to these correctly prefixed names.
+        volumeMounts:
+        - name: bluemap-config
+          mountPath: /data/plugins/BlueMap
       volumes:
       - name: data
         persistentVolumeClaim:

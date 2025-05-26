@@ -15,6 +15,6 @@ spec:
         pathType: Prefix
         backend:
           service:
-            name: bluemap-web-service # Will be prefixed, must match Bluemap Service name
+            name: bluemap-lazy-proxy-service # Will be prefixed, must match Bluemap Service name
             port:
-              name: web # Or number: 8100
+              name: http # Or number: 8100

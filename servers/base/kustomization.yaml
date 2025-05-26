@@ -7,12 +7,13 @@ resources:
   - minecraft-server-service.yaml
   - minecraft-data-pvc.yaml
   - minecraft-backup-pvc.yaml
-  - bluemap-deployment.yaml
-  - bluemap-service.yaml
   - bluemap-ingress.yaml
   - bluemap-configmaps.yaml
   - bluemap-data-pvc.yaml
   - bluemap-web-pvc.yaml
+  - bluemap-lazy-proxy-nginx-config.yaml
+  - bluemap-lazy-proxy-deployment.yaml
+  - bluemap-lazy-proxy-service.yaml
 
 # Variable to hold the instance name (e.g., "vintage")
 # This will be sourced from the 'instance' label applied by commonLabels from the overlay.

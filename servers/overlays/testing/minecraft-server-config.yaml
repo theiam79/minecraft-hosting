@@ -2,7 +2,11 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: minecraft-server # Kustomize matches this name from base
+  annotations:
+    "mc-router.itzg.me/defaultServer": "true"
 spec:
+  serviceName: testing-minecraft-server
+  replicas: 1
   template:
     spec:
       containers:
@@ -12,19 +16,24 @@ spec:
           value: ""
         - name: JVM_XX_OPTS
           value: "-XX:MaxRAMPercentage=75"
-        # #fabric uses a different bluemap config location
-        # volumeMounts:
-        # - name: bluemap-config
-        #   mountPath: /data/plugins/BlueMap
+        - name: MODE
+          value: creative
+        - name: TYPE
+          value: FABRIC
+        - name: MODRINTH_PROJECTS
+          value: |
+            fabric-api
+            chunky
+            bluemap
       # Patch claimNames to use the Kustomize variable and base PVC name.
       # The namePrefix from the overlay's kustomization.yaml will ensure the PVCs
-      # are created with names like "sample-minecraft-data-pvc".
+      # are created with names like "testing-minecraft-data-pvc".
       # This patch ensures the StatefulSet refers to these correctly prefixed names.
       volumes:
       - name: data
         persistentVolumeClaim:
-          claimName: sample-minecraft-data-pvc
+          claimName: testing-minecraft-data-pvc
       - name: backups
         persistentVolumeClaim:
-          claimName: sample-minecraft-backup-pvc
+          claimName: testing-minecraft-backup-pvc
       # Other volumes (like for spigot.jar or existing world) will be added by their respective optional patches

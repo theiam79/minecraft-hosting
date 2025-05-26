@@ -24,16 +24,10 @@ patches:
       name: minecraft-server # Name from base
     path: minecraft-server-config.yaml
 
-  # Patch Bluemap Deployment (Minecraft world PVC claimName, Bluemap data PVC claimName, ConfigMap names)
   - target:
-      kind: Deployment
-      name: bluemap-web # Name from base
-    path: bluemap-deployment-patch.yaml # Renamed patch file for clarity
-
-  # - target:
-  #     kind: ConfigMap
-  #     name: bluemap-map-config # Explicit prefixed name
-  #   path: bluemap-map-patch.yaml
+      kind: ConfigMap
+      name: bluemap-lazy-proxy-nginx-conf # Base name
+    path: patch-lazy-proxy-nginx-conf.yaml # Create this patch file
 
 patchesStrategicMerge:
   - provide-existing-world.yaml

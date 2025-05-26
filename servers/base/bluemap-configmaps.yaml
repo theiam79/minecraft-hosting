@@ -6,14 +6,8 @@ metadata:
 data:
   core.conf: |
     accept-download: true
-    data: "data" # Relative to /app in the container
+    data: "bluemap" # Relative to /app in the container
     render-thread-count: 2 # Default, can be patched
-  webapp.conf: |
-    webroot: "web" # Relative to /app/data in the container
-    min-zoom-distance: 5
-    max-zoom-distance: 100000
-  webserver.conf: |
-    webroot: "web" # Relative to /app/data in the container
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -28,7 +22,7 @@ data:
     name: "Overworld"
     ambient-light: 0.1
     cave-detection-ocean-floor: -5
-    min-inhabited-time: 1
+    min-inhabited-time: 0
   nether.conf: |
     world: "world" # Path to Nether world data
     dimension: "minecraft:the_nether"
@@ -40,7 +34,7 @@ data:
     remove-caves-below-y: -10000
     cave-detection-ocean-floor: -5
     max-y: 90
-    min-inhabited-time: 1
+    min-inhabited-time: 0
   end.conf: |
     world: "world" # Path to End world data
     dimension: "minecraft:the_end"
@@ -51,4 +45,4 @@ data:
     ambient-light: 0.6
     remove-caves-below-y: -10000
     cave-detection-ocean-floor: -5
-    min-inhabited-time: 1
+    min-inhabited-time: 0

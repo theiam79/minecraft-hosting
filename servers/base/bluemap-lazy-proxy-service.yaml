@@ -1,0 +1,12 @@
+# base/bluemap-lazy-proxy-service.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: bluemap-lazy-proxy-service # Will be prefixed
+spec:
+  selector:
+    app: bluemap-lazy-proxy # Will be prefixed (matches labels on Nginx lazy proxy pods)
+  ports:
+  - name: http
+    port: 80 # Port the Ingress will connect to
+    targetPort: 8080 # Port the Nginx container inside the lazy proxy listens on

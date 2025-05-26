@@ -30,32 +30,20 @@ patches:
       name: bluemap-web # Name from base
     path: bluemap-deployment-patch.yaml # Renamed patch file for clarity
 
-  # (Optional) Patch Bluemap ConfigMaps if you need to tweak specific settings
+  - target:
+      kind: ConfigMap
+      name: bluemap-lazy-proxy-nginx-conf # Base name
+    path: patch-lazy-proxy-nginx-conf.yaml # Create this patch file
+
   # - target:
   #     kind: ConfigMap
-  #     name: bluemap-core-config # Name from base
-  #   patch: |-
-  #     apiVersion: v1
-  #     kind: ConfigMap
-  #     metadata:
-  #       name: bluemap-core-config
-  #     data:
-  #       core.conf: |
-  #         accept-download: true # Overridden value
-  #         render-thread-count: 3 # Overridden value
+  #     name: bluemap-core-config # Explicit prefixed name
+  #   path: bluemap-core-patch.yaml
+
   # - target:
   #     kind: ConfigMap
-  #     name: bluemap-map-config
-  #   patch: |-
-  #     apiVersion: v1
-  #     kind: ConfigMap
-  #     metadata:
-  #       name: bluemap-map-config
-  #     data:
-  #       overworld.conf: |
-  #         world: "world"
-  #         name: "Overworld" # Custom name
-  #         # Add other specific map settings
+  #     name: bluemap-map-config # Explicit prefixed name
+  #   path: bluemap-map-patch.yaml
 
 # (Optional) Uncomment to include patches for existing world or Spigot JAR
 # patchesStrategicMerge:

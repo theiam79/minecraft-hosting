@@ -1,0 +1,79 @@
+# base/bluemap-lazy-proxy-deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: bluemap-lazy-proxy # Will be prefixed
+  labels:
+    app: bluemap-lazy-proxy # Will be prefixed
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: bluemap-lazy-proxy # Will be prefixed
+  template:
+    metadata:
+      labels:
+        app: bluemap-lazy-proxy # Will be prefixed
+      annotations:
+        reloader.stakater.com/auto: "true" # If you use stakater reloader for configmap changes
+    spec:
+      initContainers:
+        - name: wait-for-minecraft-first-start # Renamed for clarity
+          image: alpine/git # Using alpine/git as it includes shell tools like find, ls, wc
+          imagePullPolicy: IfNotPresent
+          command:
+            - 'sh'
+            - '-c'
+            - |
+              set -e # Exit immediately if a command exits with a non-zero status.
+              
+              INDEX_FILE="/web/index.html"
+              
+              echo "Waiting for $INDEX_FILE"
+              
+              while true; do
+
+                if [ -f $INDEX_FILE ]; then
+                  echo "Found $INDEX_FILE - Assume first world start complete"
+                  cat $INDEX_FILE
+                  break
+                else
+                  echo "$INDEX_FILE not found. Sleeping for 20 seconds..."
+                  sleep 20
+                fi
+              done
+              
+              echo "Bluemap mod has started, proxy can proceed"
+          volumeMounts:
+            - name: bluemap-mod-static-output
+              mountPath: /web
+              readOnly: true
+              subPath: web
+      containers:
+      - name: nginx-lazy-proxy
+        image: nginx:stable-alpine # Using a specific stable alpine version
+        ports:
+        - containerPort: 8080 # Matches listen port in nginx config (default.conf)
+          name: http
+        volumeMounts:
+          - name: nginx-config # Volume for nginx config
+            mountPath: /etc/nginx/conf.d # Mounts default.conf from the ConfigMap
+          - name: bluemap-mod-static-output # Volume for static files from Bluemap mod
+            # This mountPath must match the 'root' directive in the @fallback location in nginx default.conf
+            mountPath: /usr/share/nginx/html/bluemap_mod_webroot
+            readOnly: true
+            subPath: web
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m"
+          limits:
+            memory: "128Mi"
+            cpu: "250m"
+      volumes:
+      - name: nginx-config
+        configMap:
+          name: bluemap-lazy-proxy-nginx-conf # Will be prefixed
+      - name: bluemap-mod-static-output
+        persistentVolumeClaim:
+          claimName: bluemap-web-pvc # Assumes Bluemap mod writes static files to this PVC

@@ -23,5 +23,5 @@ spec:
       volumes:
       - name: spigot-custom-jar
         hostPath:
-          path: /home/minecraft/servers/overlays/vintage/spigot-1.13.2.jar # Actual path on your k3s node
+          path: /home/minecraft/servers/overlays/vintage/spigot-1.13.2-j11.jar # Actual path on your k3s node
           type: File

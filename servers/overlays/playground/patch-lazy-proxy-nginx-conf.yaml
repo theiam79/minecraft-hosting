@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bluemap-lazy-proxy-nginx-conf # Kustomize matches this base name
+data:
+  default.conf: | # Note: This replaces the ENTIRE default.conf content
+    server {
+        listen 8080;
+        root /usr/share/nginx/html/bluemap_mod_webroot;
+
+        location /maps/ {
+          # All high-res tile data and some json data is precompressed into *.gz files
+          gzip_static always;
+
+          # Return 204 No Content if requesting a missing tile
+          location ~* ^/maps/[^/]*/tiles/ {
+            error_page 404 = @no-content;
+          }
+
+          # Proxy all requests for live data to the integrated webserver.
+          # Fall back to @server-offline if it can't be contacted.
+          location ~* ^/maps/[^/]*/live/ {
+            error_page 502 504 = @server-offline;
+            resolver kube-dns.kube-system.svc.cluster.local;
+            set $live_bluemap_upstream http://playground-minecraft-server.minecraft-playground.svc.cluster.local:8100; # MODIFIED for 'playground' instance and port 8100
+            proxy_pass $live_bluemap_upstream;
+          }
+        }
+
+        location @no-content {
+          internal;
+          return 204;
+        }
+
+        # Serve "live" data from the disk when the integrated webserver can't be reached
+        location @server-offline {
+          internal;
+          try_files $uri =204;
+        }
+    }

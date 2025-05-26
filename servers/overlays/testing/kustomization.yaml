@@ -1,10 +1,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
-namePrefix: playground- # This is the single line to change for the "name"
+namePrefix: testing- # This is the single line to change for the "name"
 
 # Namespace for this instance, if you use namespaces
-namespace: minecraft-playground
+namespace: minecraft-testing
 
 resources:
   - ../../base
@@ -13,7 +13,7 @@ resources:
 # Replaced 'commonLabels:' with 'labels:' transformer
 labels:
 - pairs:
-    instance: playground # This label is primarily for organization/selection now
+    instance: testing # This label is primarily for organization/selection now
   includeSelectors: true # Ensures selectors are updated if they use this label
   includeTemplates: true # Ensures pod templates get this label if they match
 
@@ -23,6 +23,16 @@ patches:
       kind: StatefulSet
       name: minecraft-server # Name from base
     path: minecraft-server-config.yaml
+
+  # - target:
+  #     kind: ConfigMap
+  #     name: bluemap-core-config # Explicit prefixed name
+  #   path: bluemap-core-patch.yaml
+
+  # - target:
+  #     kind: ConfigMap
+  #     name: bluemap-map-config # Explicit prefixed name
+  #   path: bluemap-map-patch.yaml
 
   - target:
       kind: ConfigMap

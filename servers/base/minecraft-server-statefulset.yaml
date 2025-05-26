@@ -6,7 +6,7 @@ metadata:
   labels:
     app: minecraft-server # Will be prefixed by overlay
 spec:
-  replicas: 0
+  replicas: 1 # start on to confirm server working
   serviceName: minecraft-server # Will be prefixed by overlay
   selector:
     matchLabels:
@@ -19,6 +19,25 @@ spec:
       securityContext:
         runAsUser: 1000
         fsGroup: 1000
+      initContainers:
+      - name: copy-configmap
+        image: alpine/git # Using alpine/git as an example if configs were in git, or just alpine
+        imagePullPolicy: IfNotPresent
+        command: 
+          - 'sh'
+          - '-c'
+          - |
+            mkdir -p /dest/maps
+            mkdir -p /cfg-maps
+            cp -Lr /cfg-core/* /dest/
+            cp -Lr /cfg-maps/* /dest/maps/
+        volumeMounts:
+        - name: bluemap-core-cm # Renamed for clarity
+          mountPath: /cfg-core
+        - name: bluemap-map-cm  # Renamed for clarity
+          mountPath: /cfg-maps
+        - name: bluemap-config # Renamed for clarity
+          mountPath: /dest
       containers:
       - name: minecraft-server-container # Renamed for clarity, will NOT be prefixed by default namePrefix
         image: itzg/minecraft-server:latest # Default image, override in overlay
@@ -31,21 +50,35 @@ spec:
         - name: EULA
           value: "TRUE"
         - name: TYPE
-          value: VANILLA
+          value: FABRIC
         - name: DIFFICULTY
           value: normal
         - name: FORCE_GAMEMODE
           value: "true"
         - name: MODE
           value: survival
+        - name: MODRINTH_PROJECTS
+          value: |
+            bluemap
+        - name: OPS
+          value: |
+            TheIAm79
+        - name: EXISTING_OPS_FILE
+          value: MERGE
         # Add other common environment variables here if any
         # TYPE, CUSTOM_SERVER, MAX_MEMORY, WORLD will be set in overlay patch
         ports:
         - containerPort: 25565
           name: minecraft
+        - containerPort: 8100
+          name: bluemap
         volumeMounts:
         - name: data
           mountPath: /data
+        - name: bluemap-data
+          mountPath: /data/bluemap
+        - name: bluemap-config
+          mountPath: /data/config/bluemap
         # world-backup and spigot-jar volumeMounts will be added by optional patches in overlay
       - name: mc-backup-container # Renamed for clarity
         image: itzg/mc-backup:latest # Default image
@@ -69,4 +102,17 @@ spec:
       - name: backups # This name is referenced by volumeMounts
         persistentVolumeClaim:
           claimName: minecraft-backup-pvc # Will be prefixed by overlay
+      - name: bluemap-data
+        persistentVolumeClaim:
+          claimName: bluemap-web-pvc
+      - name: bluemap-config # Used by initContainer and bluemap container
+        emptyDir: {}
+      - name: bluemap-core-cm
+        configMap:
+          name: bluemap-core-config # Will be prefixed, must match CM name
+      - name: bluemap-map-cm
+        # emptyDir: {}
+        configMap:
+          name: bluemap-map-config # Will be prefixed, must match CM name
+
       # world-backup and spigot-jar volumes will be added by optional patches in overlay
