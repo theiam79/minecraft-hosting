@@ -65,6 +65,8 @@ spec:
             TheIAm79
         - name: EXISTING_OPS_FILE
           value: MERGE
+        - name: WHITELIST_FILE
+          value: /whitelist/whitelist.json
         # Add other common environment variables here if any
         # TYPE, CUSTOM_SERVER, MAX_MEMORY, WORLD will be set in overlay patch
         ports:
@@ -79,6 +81,9 @@ spec:
           mountPath: /data/bluemap
         - name: bluemap-config
           mountPath: /data/config/bluemap
+        - name: whitelist-config
+          mountPath: /whitelist # Must match $CUSTOM_SERVER
+          readOnly: true
         # world-backup and spigot-jar volumeMounts will be added by optional patches in overlay
       - name: mc-backup-container # Renamed for clarity
         image: itzg/mc-backup:latest # Default image
@@ -114,5 +119,7 @@ spec:
         # emptyDir: {}
         configMap:
           name: bluemap-map-config # Will be prefixed, must match CM name
-
+      - name: whitelist-config
+        configMap:
+          name: whitelist-config
       # world-backup and spigot-jar volumes will be added by optional patches in overlay

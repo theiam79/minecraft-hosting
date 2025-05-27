@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: whitelist-config # Will be prefixed
+data:
+  whitelist.json: |
+    [
+    ]
